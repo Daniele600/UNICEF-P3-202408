@@ -2,6 +2,7 @@ import pandas as pd
 from dateutil.relativedelta import relativedelta
 
 import data_access.edu_export
+import utils.get_markdown_text
 
 # Constants
 INPUT_FILE_PATH = file_path = "01_rawdata/Zimbabwe_children_under5_interview.csv"
@@ -113,7 +114,30 @@ df_ratios = df_ratios.reset_index()
 df_ratios["pcnt"] = (df_ratios["y"] / (df_ratios["y"] + df_ratios["n"])) * 100
 df_ratios["pcnt"] = round(df_ratios["pcnt"], 1)
 
+indicators_analysis_results = {}
+for c in categorical_cols:
+    start_tag = f"<!--_Task2_result_{c}_start-->"
+    end_tag = f"<!--_Task2_result_{c}_end-->"
+    text = utils.get_markdown_text.get_markdown_text_between_tags(
+        "README.md", start_tag, end_tag
+    )
+    indicators_analysis_results[c] = text
+
 # we generated the data, we now want to create a visualization in HTML, pass the data to the exporter function
 data_access.edu_export.export(
-    OUT_FILE_PATH, df_ratios, categorical_cols, indicators_title_map
+    OUT_FILE_PATH,
+    df_ratios,
+    categorical_cols,
+    indicators_title_map,
+    indicators_analysis_results,
 )
+
+for ind in categorical_cols:
+    df = df_ratios[df_ratios["INDICATOR"] == ind]
+    for idx, row in df.iterrows():
+        months = row["MONTHS"]
+        if months > 11:
+            months = months - 12
+        print(
+            f"3 years and {months} months old child, indicator {indicators_title_map[ind] }, positive response percentage is {row['pcnt']}"
+        )
