@@ -4,6 +4,7 @@ import data_access.reader_population
 import data_access.reader_on_off_track
 import data_access.reader_sdmx
 import plot_mnch
+import utils.get_markdown_text
 
 # Constants
 # The data is hosted on a SDMX registry, it has convenient APIs to download data, use the query builder to craft the Query URL
@@ -108,16 +109,20 @@ def process_on_off_track_data(df: pd.DataFrame) -> pd.DataFrame:
 
 
 """Read and process data start"""
+print("Reading MNCH data")
 df_mnch = data_access.reader_sdmx.get_data_as_dataframe(DATA_URL_MNCH)
 df_mnch = process_mnch(df_mnch)
 
+print("Reading population data")
 df_pop = data_access.reader_population.get_data_as_dataframe(
     FPATH_POPULATION, sheet_name="Projections"
 )
 df_pop = process_population_data(df_pop)
 
+print("Reading on off track data")
 df_track = data_access.reader_on_off_track.get_data_as_dataframe(FPATH_ONOFF_TRACK)
 df_track = process_on_off_track_data(df_track)
+print("Reading data done")
 """Read and process data end"""
 
 """Merge data start"""
@@ -158,7 +163,7 @@ df = df[df["STATUS_U5MR"] != "Achieved"]
 df_anc4 = df[df["INDICATOR"] == "MNCH_ANC4"]
 df_sab = df[df["INDICATOR"] == "MNCH_SAB"]
 
-#Calculate the weighted values
+# Calculate the weighted values
 weighted_ANC4_ontrack = calc_weighted_coverage(
     df_anc4[df_anc4["STATUS_U5MR"] == "On Track"]
 )
@@ -172,7 +177,15 @@ weighted_SAB_offtrack = calc_weighted_coverage(
     df_sab[df_sab["STATUS_U5MR"] == "Acceleration Needed"]
 )
 
-#plot the results
+results_text = ""
+results_text = utils.get_markdown_text.get_markdown_text_between_tags(
+    "README.md", "<!--_Task1_result_start-->", "<!--_Task1_result_end-->"
+)
+assert (
+    results_text != ""
+), "Results text is contained between hidden tags in the README.md file. No text found please check"
+
+# plot the results
 plot_mnch.plot_bars(
     [weighted_ANC4_ontrack, weighted_ANC4_offtrack],
     [weighted_SAB_ontrack, weighted_SAB_offtrack],
@@ -180,4 +193,5 @@ plot_mnch.plot_bars(
     ["ON track", "OFF track"],
     "Antenatal care",
     "Skilled birth attendant",
+    results_text,
 )

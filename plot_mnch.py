@@ -29,6 +29,7 @@ def plot_bars(
     labels2: list,
     chart_title1: str,
     chart_title2: str,
+    results_text: str,
 ):
     """
     Plots two barchart, each barchart has two values.
@@ -40,10 +41,11 @@ def plot_bars(
         labels2: A two elements list containing the labels for the second 2 values
         chart_title1: The title for the first chart
         chart_title2: The title for the second chart
+        results_text: The results analysis text, will be shown below the charts
     """
 
     # Creating a figure and axis objects
-    fig = plt.figure(figsize=(10, 8))
+    fig = plt.figure(figsize=(12, 8))
     gs = fig.add_gridspec(2, 2)
     ax1 = fig.add_subplot(gs[0, 0])
     ax2 = fig.add_subplot(gs[0, 1])
@@ -58,11 +60,9 @@ def plot_bars(
     _add_text_to_bar(bars1, ax1)
     _add_text_to_bar(bars2, ax2)
 
-    text = " Put some text here"
-
     # # Adjust layout to make space for the text box
     ax3.axis("off")
-    ax3.text(0, 1, text)
+    ax3.text(0, 1, results_text, wrap=True)
 
     # Display the plots
     plt.tight_layout()
