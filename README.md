@@ -16,8 +16,8 @@ Both parts of the assessment are stored in the same project to make it faster fo
 Execute the following command: **python main_mnch.py**
 
 ### How does it work?
-Running the main_mnch.py file starts the data extraction, data cleaning, merginig and analysis process. The results are shown in a windows that opens automatically.
-The results shown in the window are the same contents that can be found in the "Results" section of this README.md file. The application is connected to the readme and pulls the text automatically to avoid discrepancies.
+Running the main_mnch.py file starts the data extraction, data cleaning, merginig and analysis process. The results are shown in a window that opens automatically.  
+The analysis shown below the charts is the same that can be found in the "Results" section of this README.md file. The application is connected to the readme and pulls the text automatically to avoid discrepancies.
 
 ### Results
 <!--_Task1_result_start-->
@@ -28,7 +28,7 @@ The analysis indicates that antenatal care visits have a relatively minor impact
 This suggests that increasing the coverage of skilled birth attendance may be a more effective intervention for reducing the under-5 mortality rate.  
 While antenatal care visits are important, their impact might be less pronounced in comparison to the presence of skilled birth attendants during delivery, which directly influences birth outcomes. Therefore, to make substantial progress in reducing under-5 mortality, efforts should focus on enhancing the availability and accessibility of skilled birth attendance. 
 
-Antenatal care, even if having less impact on the targets may still be important for other health outcomes not related to the analysis but still important.
+Antenatal care, even if having less impact on the targets may still be important for other health outcomes not related to the analysis but still important.  
 Other factors could contribute to the differences and further investigation is required.
 <!--_Task1_result_end-->
 
