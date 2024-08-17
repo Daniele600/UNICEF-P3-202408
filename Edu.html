@@ -10,7 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="edu_style.css">
-    
+
 </head>
 
 <body>
@@ -25,25 +25,46 @@
     <script>
         node_charts = document.getElementById("charts")
         edu_data.forEach(ind => {
-            var chart_div = document.createElement('div');
-            chart_div.className = "row chart-group mb-3"
+            var card_div = document.createElement('div');
+            card_div.className = "card mb-3";
 
-            var div_cnv_cont = document.createElement('div');
-            div_cnv_cont.style = "margin: auto;"
-            div_cnv_cont.className = "col-lg";
+            var inner_card_div = document.createElement('div');
+            inner_card_div.className = "row g-0";
+
+
+            var card_title = document.createElement('div');
+            card_title.className = "card-header";
+            card_title.innerHTML = ind.title;
+
+            var left_area = document.createElement('div');
+            left_area.className = "col-lg-6";
+
+            var right_area = document.createElement('div');
+            right_area.className = "col-lg-6 p-3";
+            right_area.innerHTML = ind.explaination;
+
+            var card_body = document.createElement('div');
+            card_body.className = "card-body";
 
             var chart_canvas = document.createElement('canvas');
             chart_canvas.id = "cnv" + ind.id;
 
-            div_cnv_cont.appendChild(chart_canvas);
-            chart_div.appendChild(div_cnv_cont);
+            card_div.appendChild(card_title);
+            card_div.appendChild(inner_card_div);
+            left_area.appendChild(chart_canvas);
+            inner_card_div.appendChild(left_area);
+            inner_card_div.appendChild(right_area)
 
-            text_div = document.createElement('div');
-            text_div.className = "col-lg";
-            text_div.innerHTML = ind.explaination;
-            chart_div.appendChild(text_div);
 
-            node_charts.appendChild(chart_div);
+            // div_cnv_cont.appendChild(chart_canvas);
+            // chart_div.appendChild(div_cnv_cont);
+
+            // text_div = document.createElement('div');
+            // text_div.className = "col-lg";
+            // text_div.innerHTML = ind.explaination;
+            // chart_div.appendChild(text_div);
+
+            node_charts.appendChild(card_div);
 
             var ctx = document.getElementById("cnv" + ind.id).getContext('2d');
             var lineChart = new Chart(ctx, {
@@ -51,7 +72,7 @@
                 data: {
                     labels: ind.x,
                     datasets: [{
-                        label: ind.title,
+                        // label: ind.title,
                         data: ind.y,
                         borderColor: 'rgba(34, 170, 225, 1)',
                         backgroundColor: 'rgba(34, 170, 225, 0.2)',
@@ -60,6 +81,11 @@
                     }]
                 },
                 options: {
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
                     responsive: true,
                     scales: {
                         y: {
