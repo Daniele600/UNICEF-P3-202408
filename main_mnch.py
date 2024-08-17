@@ -11,7 +11,9 @@ DATA_URL_MNCH = "https://sdmx.data.unicef.org/ws/public/sdmxapi/rest/data/UNICEF
 FPATH_POPULATION = "01_rawdata/WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx"
 FPATH_ONOFF_TRACK = "01_rawdata/On-track and off-track countries.xlsx"
 
-'''Start data processing/cleaning section'''
+"""Start data processing/cleaning section"""
+
+
 def process_mnch(df: pd.DataFrame) -> pd.DataFrame:
     # A few checks before removing the unit multiplier, to avoid introducing errors if the multiplier changes in future releases
     unit_mult_unique = df["UNIT_MULTIPLIER"].unique()
@@ -61,7 +63,8 @@ def process_mnch(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-def process_population_data(df:pd.DataFrame) -> pd.DataFrame:
+
+def process_population_data(df: pd.DataFrame) -> pd.DataFrame:
     # We're interested in country analysis, we can drop the rows having ISO3 Alpha-code empty as they're aggregates
     df = df.dropna(subset=["ISO3 Alpha-code"])
     # remove non needed columns (list the ones to keep and drop the rest)
@@ -75,23 +78,22 @@ def process_population_data(df:pd.DataFrame) -> pd.DataFrame:
 
     # only keep the 2022 projections
     df = df[df["Year"] == 2022]
-    # Convert years from floats to ints
-    df["Year"] = df["Year"].astype(int)
+    df = df.drop(columns=["Year"])
 
-    #Apply the multiplier
+    # Apply the multiplier
     df["Births (thousands)"] = df["Births (thousands)"] * 1000
 
     # column names harmonization
     cols_rename = {
         "ISO3 Alpha-code": "REF_AREA",
-        "Year": "TIME_PERIOD",
         "Births (thousands)": "DM_BIRTHS",
     }
     df = df.rename(columns=cols_rename)
 
     return df
 
-def process_on_off_track_data(df:pd.DataFrame) -> pd.DataFrame:
+
+def process_on_off_track_data(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns=["OfficialName"])
 
     # column names harmonization
@@ -100,21 +102,72 @@ def process_on_off_track_data(df:pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-'''End data processing/cleaning section'''
+
+"""End data processing/cleaning section"""
 
 
+"""Read and process data start"""
 df_mnch = data_access.reader_sdmx.get_data_as_dataframe(DATA_URL_MNCH)
 df_mnch = process_mnch(df_mnch)
-print(df_mnch.head())
-
 
 df_pop = data_access.reader_population.get_data_as_dataframe(
     FPATH_POPULATION, sheet_name="Projections"
 )
 df_pop = process_population_data(df_pop)
-print(df_pop.head())
-
 
 df_track = data_access.reader_on_off_track.get_data_as_dataframe(FPATH_ONOFF_TRACK)
 df_track = process_on_off_track_data(df_track)
-print(df_track.head())
+"""Read and process data end"""
+
+"""Merge data start"""
+# Drop the countries that are not in the on_track off_track dataset
+df_mnch = df_mnch[df_mnch["REF_AREA"].isin(df_track["REF_AREA"].unique())]
+# Merge on track off track data with population data
+df = df_track.merge(df_pop, left_on=["REF_AREA"], right_on=["REF_AREA"], how="left")
+assert len(df) == len(
+    df_track
+), "The join of df_track and df_pop generated unwanted rows, check"
+del df_pop
+
+df = df_mnch.merge(
+    df,
+    left_on=["REF_AREA"],
+    right_on=["REF_AREA"],
+    how="left",
+)
+assert len(df) == len(
+    df_mnch
+), "The join of df and df_mnch generated unwanted rows, check"
+del df_mnch
+"""Merge data end"""
+
+
+# Start the analysys and chart
+def calc_weighted_coverage(df: pd.DataFrame) -> float:
+    """ """
+    ret = (df["COVERAGE"] * df["DM_BIRTHS"]).sum() / (df["DM_BIRTHS"].sum())
+    ret = ret * 100.0
+    return ret
+
+
+# We're only interested in the On track and Acceleration needed rows, remove the rows with status == achieved
+df = df[df["STATUS_U5MR"] != "Achieved"]
+
+# Split in 2 dataframes: ANC4 abd SAB
+df_anc4 = df[df["INDICATOR"] == "MNCH_ANC4"]
+df_sab = df[df["INDICATOR"] == "MNCH_SAB"]
+
+#Calculate the weighted values
+weighted_ANC4_ontrack = calc_weighted_coverage(
+    df_anc4[df_anc4["STATUS_U5MR"] == "On Track"]
+)
+weighted_ANC4_offtrack = calc_weighted_coverage(
+    df_anc4[df_anc4["STATUS_U5MR"] == "Acceleration Needed"]
+)
+weighted_SAB_ontrack = calc_weighted_coverage(
+    df_sab[df_sab["STATUS_U5MR"] == "On Track"]
+)
+weighted_SAB_offtrack = calc_weighted_coverage(
+    df_sab[df_sab["STATUS_U5MR"] == "Acceleration Needed"]
+)
+
