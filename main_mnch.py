@@ -3,6 +3,7 @@ import pandas as pd
 import data_access.reader_population
 import data_access.reader_on_off_track
 import data_access.reader_sdmx
+import plot_mnch
 
 # Constants
 # The data is hosted on a SDMX registry, it has convenient APIs to download data, use the query builder to craft the Query URL
@@ -171,3 +172,12 @@ weighted_SAB_offtrack = calc_weighted_coverage(
     df_sab[df_sab["STATUS_U5MR"] == "Acceleration Needed"]
 )
 
+#plot the results
+plot_mnch.plot_bars(
+    [weighted_ANC4_ontrack, weighted_ANC4_offtrack],
+    [weighted_SAB_ontrack, weighted_SAB_offtrack],
+    ["ON track", "OFF track"],
+    ["ON track", "OFF track"],
+    "Antenatal care",
+    "Skilled birth attendant",
+)
