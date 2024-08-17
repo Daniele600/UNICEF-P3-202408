@@ -131,13 +131,3 @@ data_access.edu_export.export(
     indicators_title_map,
     indicators_analysis_results,
 )
-
-for ind in categorical_cols:
-    df = df_ratios[df_ratios["INDICATOR"] == ind]
-    for idx, row in df.iterrows():
-        months = row["MONTHS"]
-        if months > 11:
-            months = months - 12
-        print(
-            f"3 years and {months} months old child, indicator {indicators_title_map[ind] }, positive response percentage is {row['pcnt']}"
-        )

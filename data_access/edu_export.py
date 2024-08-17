@@ -45,7 +45,7 @@ def export(
             to_add["y"].append(f'{row["pcnt"]}')
 
         if ind in results and results[ind] != "":
-            to_add["explaination"] = results[ind]
+            to_add["explaination"] = results[ind].replace("  ", "<br/>")
         else:
             to_add["explaination"] = "Missing"
 

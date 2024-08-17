@@ -38,8 +38,10 @@ Execute the following command: **python main_edu.py**
 Or open the **Edu.html** to see the Data Perspective
 
 ### How does it work?
-Running the main_edu.py file extracts the data and performs the calculations, it outputs the results in a .js file that will be used by the Interface to show the analysis results. Ideally the results should be pushed to a server and the data pulled by the Web Application, in this case everything can be run locally.
-The Web Application is very basic and can be improved introducing frameworks like React.js.
+Running the **main_edu.py** file extracts the data and performs the calculations, it outputs the results in a .js file (outputs_edu/edu_data.jd) that will be used by the Interface to show the analysis results.  Ideally the results should be pushed to a server and the data pulled by the Web Application, in this case everything can be run locally, also in a prod environment the js file should not be pushed to the repo.  
+The Web Application is very basic and can be improved introducing frameworks like React.js.  
+To open the web interface just open the **Edu.html** file in your browser.  
+Also in this case the python file reads the README.md and embeds the results in the application, therefore the results contained in this readme and in the app are the same and linked (Create Once and Publish Everywhere principle)
 
 
 ### Results
